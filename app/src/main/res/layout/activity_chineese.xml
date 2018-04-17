@@ -23,19 +23,24 @@
             android:onClick="goBackOnClick" />
 
         <Button
-            android:id="@+id/button"
+            android:id="@+id/lotusSoup"
             android:layout_width="350dp"
             android:layout_height="161dp"
-            android:background="@drawable/csouplayout" />
+            android:background="@drawable/csouplayout"
+            android:onClick="onItemClick" />
 
         <Button
+            android:id="@+id/noodles"
             android:layout_width="350dp"
             android:layout_height="156dp"
-            android:background="@drawable/noodleslayout" />
+            android:background="@drawable/noodleslayout"
+            android:onClick="onItemClick" />
 
         <Button
+            android:id="@+id/strawberrykuchi"
             android:layout_width="352dp"
             android:layout_height="157dp"
-            android:background="@drawable/strawberrylayout" />
+            android:background="@drawable/strawberrylayout"
+            android:onClick="onItemClick" />
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

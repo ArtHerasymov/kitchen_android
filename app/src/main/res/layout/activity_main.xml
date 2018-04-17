@@ -12,19 +12,22 @@
         android:layout_height="495dp"
         android:orientation="vertical"
         tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="8dp">
+        tools:layout_editor_absoluteY="0dp">
 
         <Button
             android:id="@+id/newOrderButton"
+            android:layout_marginTop="50dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="onClick"
-            android:text="New Order" />
+            android:layout_height="150dp"
+            android:width="300dp"
+            android:background="@drawable/neworderbuttonlayout"
+            android:onClick="onClick" />
 
         <Button
             android:id="@+id/checkButton"
+            android:layout_marginTop="50dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Check Orders" />
+            android:layout_height="150dp"
+            android:background="@drawable/checkbtnlayout" />
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>
