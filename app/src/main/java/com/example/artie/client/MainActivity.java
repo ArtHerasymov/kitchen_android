@@ -3,6 +3,9 @@ package com.example.artie.client;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -24,6 +27,7 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,6 +42,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     double price = 0;
     Button lotus,noodles,strawberrykuchi,roastedsoup,carbonara,pancakes;
 
+    private List<Order> orderList = new ArrayList<>();
+    private RecyclerView recyclerView;
+    private DataAdapter oAdapter;
+
+    private Order currentOrder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
+
         setContentView(R.layout.activity_new_order);
     }
 
@@ -77,9 +87,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void onSubmitClick(View view) {
         String url = "http://192.168.1.106:5000/orders/create";
-        System.out.println("Sending request");
-        System.out.println("Items : " + itemList);
-        System.out.println("Price : " + String.valueOf(price));
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
@@ -91,17 +98,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         response,
                         Toast.LENGTH_SHORT)
                         .show();
+                currentOrder = new Order();
+                currentOrder.setItems(itemList);
+                currentOrder.setPrice(price);
+                currentOrder.setStatus("IN_PROGRESS");
+                System.out.println("RESPONSE : " + response);
+                int id = Integer.parseInt(response);
+
+                currentOrder.setId(id);
+                orderList.add(currentOrder);
             }
         }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
             @Override
             public void onErrorResponse(VolleyError error) {
                 //This code is executed if there is an error.
-                System.out.println(error.getMessage());
+                Toast.makeText(
+                        MainActivity.this,
+                        error.getMessage(),
+                        Toast.LENGTH_SHORT)
+                        .show();
             }
         }) {
             protected Map<String, String> getParams() {
                 Map<String, String> MyData = new HashMap<String, String>();
-                MyData.put("Waiter", "Johny Android"); //Add the data you'd like to send to the server.
+                MyData.put("Waiter", "Johny LOL"); //Add the data you'd like to send to the server.
                 MyData.put("Items", itemList);
                 MyData.put("DiscountID", "123");
                 MyData.put("InitialPrice",String.valueOf(price));
@@ -111,6 +131,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         MyRequestQueue.add(MyStringRequest);
     }
 
+    public void onCheckClicK(View view){
+        setContentView(R.layout.orderpage);
+        recyclerView = findViewById(R.id.recycler_view);
+
+        for(Order o :orderList){
+            System.out.println("ID : " + o.getId());
+            System.out.println("PRICE : " + o.getPrice());
+
+        }
+
+        oAdapter = new DataAdapter(orderList);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(oAdapter);
+    }
 
     public void onItemClick(View view){
         switch(view.getId()){
@@ -139,5 +175,50 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 price += 5;
                 break;
         }
+    }
+
+    public void onRefreshCick(View view){
+        TextView  curid = view.findViewById(R.id.id);
+        System.out.println(curid.getText());
+//        String url = "http://192.168.1.106:5000/orders/create";
+//        RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
+//        StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+//            @Override
+//            public void onResponse(String response) {
+//                //This code is executed if the server responds, whether or not the response contains data.
+//                //The String 'response' contains the server's response.
+//                Toast.makeText(
+//                        MainActivity.this,
+//                        response,
+//                        Toast.LENGTH_SHORT)
+//                        .show();
+//                currentOrder = new Order();
+//                currentOrder.setItems(itemList);
+//                currentOrder.setPrice(price);
+//                currentOrder.setStatus("IN_PROGRESS");
+//                currentOrder.setId(Integer.getInteger(response));
+//                orderList.add(currentOrder);
+//            }
+//        }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                //This code is executed if there is an error.
+//                Toast.makeText(
+//                        MainActivity.this,
+//                        error.getMessage(),
+//                        Toast.LENGTH_SHORT)
+//                        .show();
+//            }
+//        }) {
+//            protected Map<String, String> getParams() {
+//                Map<String, String> MyData = new HashMap<String, String>();
+//                MyData.put("Waiter", "Johny LOL"); //Add the data you'd like to send to the server.
+//                MyData.put("Items", itemList);
+//                MyData.put("DiscountID", "123");
+//                MyData.put("InitialPrice",String.valueOf(price));
+//                return MyData;
+//            }
+//        };
+//        MyRequestQueue.add(MyStringRequest);
     }
 }
