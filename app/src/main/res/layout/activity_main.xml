@@ -14,11 +14,22 @@
         tools:layout_editor_absoluteX="8dp"
         tools:layout_editor_absoluteY="0dp">
 
+        <ToggleButton
+            android:id="@+id/changeLocaleButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="200dp"
+            android:layout_marginTop="5dp"
+            android:background="@color/colorPrimary"
+            android:onClick="onLocaleChangeClock"
+            android:text=""
+            android:textColor="@android:color/holo_orange_dark" />
+
         <Button
             android:id="@+id/newOrderButton"
-            android:layout_marginTop="50dp"
             android:layout_width="match_parent"
             android:layout_height="150dp"
+            android:layout_marginTop="50dp"
             android:width="300dp"
             android:background="@drawable/neworderbuttonlayout"
             android:onClick="onClick" />

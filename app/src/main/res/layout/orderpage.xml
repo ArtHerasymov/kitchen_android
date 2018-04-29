@@ -4,8 +4,19 @@
     android:layout_height="match_parent"
     android:background="@color/colorAccent">
 
+    <Button
+        android:id="@+id/backFromCheck"
+        android:background="@drawable/arrowbutton"
+        android:layout_width="90dp"
+        android:layout_height="50dp"
+        android:onClick="onBackFromCheck"
+        android:textColor="@android:color/holo_orange_light"
+        android:textColorLink="@android:color/holo_orange_light"
+        android:textStyle="bold" />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"
+        android:layout_marginTop="100dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="vertical" />
