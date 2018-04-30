@@ -17,7 +17,6 @@ public class Order {
         this.status = status;
     }
 
-
     public String getItems() {
         return items;
     }

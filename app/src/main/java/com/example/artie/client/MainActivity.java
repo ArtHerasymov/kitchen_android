@@ -88,6 +88,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void cancelClick(View view) {
         setContentView(R.layout.activity_main);
+        changeLocaleButton = findViewById(R.id.changeLocaleButton);
+        changeLocaleButton.setText(currentLocale);
     }
 
     public void onSubmitClick(View view) {
@@ -164,11 +166,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void onRefreshCick(final View view){
-        TextView  curid = view.findViewById(R.id.id);
+        final TextView  curid = view.findViewById(R.id.id);
         final TextView statusView = view.findViewById(R.id.status);
-        System.out.println(curid.getText());
+
         RequestQueue queue = Volley.newRequestQueue(this);
-        String url ="http://192.168.43.196:5000/orders/details/"+curid.getText();
+        String url ="http://192.168.1.105:5000/orders/details/"+curid.getText();
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
@@ -176,6 +178,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onResponse(String response) {
                             statusView.setText(response);
+                            for(Order o : orderList){
+                                if(o.getId() == Integer.parseInt(curid.getText().toString())){
+                                    o.setStatus(response);
+                                }
+                            }
                             System.out.println("RESPONSE : " + response);
                         }
                 }, new Response.ErrorListener() {
@@ -187,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void confirmButtonClick(View view) {
-        String url = "http://192.168.43.196:5000/orders/create";
+        String url = "http://192.168.1.105:5000/orders/create";
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
@@ -205,6 +212,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 currentOrder.setId(id);
                 orderList.add(currentOrder);
+
             }
         }, new Response.ErrorListener() {
             @Override
@@ -214,14 +222,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         error.getMessage(),
                         Toast.LENGTH_SHORT)
                         .show();
+                itemList = "";
             }
         }) {
             protected Map<String, String> getParams() {
                 Map<String, String> MyData = new HashMap<String, String>();
                 MyData.put("Waiter", "Johny LOL");
+                System.out.println("ITEMS !!!!!!!!!!!!  : " + itemList);
                 MyData.put("Items", itemList);
-                MyData.put("DiscountID", "123");
                 MyData.put("InitialPrice",String.valueOf(price));
+                MyData.put("DiscountID", "128943");
                 MyData.put("Type", determineType());
                 MyData.put("Locale",currentLocale);
 
@@ -232,13 +242,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
     }
 
-    public void onCancleButtonClick(View view){
-        this.currentOrder = null;
+    public void onCancelButtonClick(View view){
+        this.itemList = "";
         setContentView(R.layout.activity_main);
+        changeLocaleButton = findViewById(R.id.changeLocaleButton);
+        changeLocaleButton.setText(currentLocale);
     }
 
     public void onBackFromCheck(View view){
         setContentView(R.layout.activity_main);
+        changeLocaleButton = findViewById(R.id.changeLocaleButton);
+        changeLocaleButton.setText(currentLocale);
     }
 
     public void onLocaleClick(View view){
@@ -275,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private String determineType(){
         if((itemList.contains("1") || itemList.contains("2") || itemList.contains("3")) &&
-                !(itemList.contains("4") || itemList.contains("5") || itemList.contains("6"))){
+                (!itemList.contains("4") && !itemList.contains("5") && !itemList.contains("6"))){
             return "CHINEESE";
         }
         else if((itemList.contains("1") || itemList.contains("2") || itemList.contains("3")) &&
