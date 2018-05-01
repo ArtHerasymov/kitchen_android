@@ -9,6 +9,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
 
     TextView responseView;
     LinkedList<String>items = new LinkedList<>();
@@ -43,13 +44,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     double price = 0;
     Button lotus,noodles,strawberrykuchi,roastedsoup,carbonara,pancakes;
     String currentLocale;
-
     private List<Order> orderList = new ArrayList<>();
     private RecyclerView recyclerView;
     private DataAdapter oAdapter;
     private Button changeLocaleButton;
 
     private Order currentOrder;
+
+    SeekBar lotusSeekbar;
+    SeekBar noodlesBar;
+    SeekBar kuchiBar;
+    SeekBar roastedBar;
+    SeekBar carbonaraBar;
+    SeekBar pancakesBar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +101,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void onSubmitClick(View view) {
+       // Remove odd comma from the end of the line
+        itemList = trimItemList(itemList);
+        // Validate preformed order
         if(this.itemList.equals("") || this.price == 0.0){
             Toast.makeText(
                     MainActivity.this,
@@ -102,10 +113,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return;
         }
         setContentView(R.layout.confirm_order);
+
+        // Attaching listeners on seekbars
+        lotusSeekbar = findViewById(R.id.seekBarLotus);
+        noodlesBar = findViewById(R.id.seekBarNoodles);
+        kuchiBar = findViewById(R.id.seekBarKuchi);
+        roastedBar = findViewById(R.id.seekBarRoastedSoup);
+        carbonaraBar = findViewById(R.id.seekBarCarbonara);
+        pancakesBar = findViewById(R.id.seekBarPancakes);
+
+        lotusSeekbar.setOnSeekBarChangeListener(this);
+        noodlesBar.setOnSeekBarChangeListener(this);
+        kuchiBar.setOnSeekBarChangeListener(this);
+        roastedBar.setOnSeekBarChangeListener(this);
+        carbonaraBar.setOnSeekBarChangeListener(this);
+        pancakesBar.setOnSeekBarChangeListener(this);
+
+
         TextView itemsView = findViewById(R.id.confirmItems);
         TextView priceView = findViewById(R.id.confirmPrice);
+        System.out.println("Items : " + itemList);
 
         itemsView.setText(itemList);
+        setupSeekbars();
         priceView.setText(String.valueOf(price));
 
     }
@@ -155,8 +185,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 message = "Pancakes added";
                 break;
         }
-        itemList = trimItemList(itemList);
-
 
         Toast.makeText(
                 MainActivity.this,
@@ -298,6 +326,112 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             return "ITALIAN";
         }
+    }
+
+   private void setupSeekbars(){
+        String[] items = itemList.split(",");
+
+        for(String item : items){
+            SeekBar currentSeekBar = null;
+            switch(item){
+                case "1": {
+                    currentSeekBar = findViewById(R.id.seekBarLotus);
+                    currentSeekBar.setProgress(currentSeekBar.getProgress() + 1);
+                    break;
+                }
+
+                case "2":{
+                    currentSeekBar = findViewById(R.id.seekBarNoodles);
+                    currentSeekBar.setProgress(currentSeekBar.getProgress() + 1);
+                    break;
+                }
+                case "3":{
+                    currentSeekBar = findViewById(R.id.seekBarKuchi);
+                    currentSeekBar.setProgress(currentSeekBar.getProgress() + 1);
+                    break;
+                }
+                case "4":{
+                    currentSeekBar = findViewById(R.id.seekBarRoastedSoup);
+                    currentSeekBar.setProgress(currentSeekBar.getProgress() + 1);
+                    break;
+                }
+                case "5":{
+                    currentSeekBar = findViewById(R.id.seekBarCarbonara);
+                    currentSeekBar.setProgress(currentSeekBar.getProgress() + 1);
+                    break;
+                }
+                case "6":{
+                    currentSeekBar = findViewById(R.id.seekBarPancakes);
+                    currentSeekBar.setProgress(currentSeekBar.getProgress() + 1);
+                    break;
+                }
+            }
+        }
+
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+        // Every time seekbar progress changes, itemList string nullifies and being refilled
+        if(!b)
+            return;
+        itemList = "";
+        LinkedList<SeekBar>seekBars = new LinkedList<>();
+
+        seekBars.add(lotusSeekbar);
+        seekBars.add(noodlesBar);
+        seekBars.add(kuchiBar);
+
+        seekBars.add(roastedBar);
+        seekBars.add(carbonaraBar);
+        seekBars.add(pancakesBar);
+
+        for(SeekBar bar :seekBars){
+            switch(bar.getId()){
+                case R.id.seekBarLotus:{
+                    for(int j = 0 ; j < bar.getProgress(); j++)
+                        itemList = itemList.concat("1,");
+                    break;
+                }
+                case R.id.seekBarNoodles:{
+                    for(int j = 0 ; j < bar.getProgress(); j++)
+                        itemList = itemList.concat("2,");
+                    break;
+                }
+                case R.id.seekBarKuchi:{
+                    for(int j = 0 ; j < bar.getProgress(); j++)
+                        itemList = itemList.concat("3,");
+                    break;
+                }
+                case R.id.seekBarRoastedSoup:{
+                    for(int j = 0 ; j < bar.getProgress(); j++)
+                        itemList = itemList.concat("4,");
+                    break;
+                }
+                case R.id.seekBarCarbonara:{
+                    for(int j = 0 ; j < bar.getProgress(); j++)
+                        itemList = itemList.concat("5,");
+                    break;
+                }
+                case R.id.seekBarPancakes:{
+                    for(int j = 0 ; j < bar.getProgress(); j++)
+                        itemList = itemList.concat("6,");
+                    break;
+                }
+            }
+        }
+        TextView itemListView = findViewById(R.id.confirmItems);
+        itemListView.setText(itemList);
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+
     }
 
 }
