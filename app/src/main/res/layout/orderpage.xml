@@ -2,17 +2,35 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorAccent">
+    android:background="@drawable/backgroundcarbon">
 
-    <Button
-        android:id="@+id/backFromCheck"
-        android:background="@drawable/arrowbutton"
-        android:layout_width="90dp"
-        android:layout_height="50dp"
-        android:onClick="onBackFromCheck"
-        android:textColor="@android:color/holo_orange_light"
-        android:textColorLink="@android:color/holo_orange_light"
-        android:textStyle="bold" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/backFromCheck"
+            android:layout_width="80dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:background="@drawable/arrowbutton"
+            android:onClick="onBackFromCheck"
+            android:textColor="@android:color/holo_orange_light"
+            android:textColorLink="@android:color/holo_orange_light"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_marginTop="10dp"
+            android:layout_width="50dp"
+            android:layout_marginLeft="225dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:background="@drawable/sync"
+            android:onClick="onSyncClick" />
+    </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"

@@ -18,7 +18,6 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.MyViewHolder> 
         public MyViewHolder(View view) {
             super(view);
             id = view.findViewById(R.id.id);
-            items = view.findViewById(R.id.items);
             price = view.findViewById(R.id.price);
             status = view.findViewById(R.id.status);
         }
@@ -41,7 +40,6 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.MyViewHolder> 
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Order order = orderList.get(position);
         holder.id.setText(order.getId() + "");
-        holder.items.setText(order.getItems());
         holder.price.setText(String.valueOf(order.getPrice()));
         holder.status.setText(order.getStatus());
     }

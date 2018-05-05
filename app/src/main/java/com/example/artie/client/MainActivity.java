@@ -20,6 +20,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -28,12 +32,17 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
@@ -102,16 +111,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void onSubmitClick(View view) {
        // Remove odd comma from the end of the line
-        itemList = trimItemList(itemList);
+        if(!itemList.equals(""))
+            itemList = trimItemList(itemList);
         // Validate preformed order
-        if(this.itemList.equals("") || this.price == 0.0){
-            Toast.makeText(
-                    MainActivity.this,
-                    "You haven't selected any items",
-                    Toast.LENGTH_SHORT)
-                    .show();
-            return;
-        }
         setContentView(R.layout.confirm_order);
 
         // Attaching listeners on seekbars
@@ -130,11 +132,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         pancakesBar.setOnSeekBarChangeListener(this);
 
 
-        TextView itemsView = findViewById(R.id.confirmItems);
         TextView priceView = findViewById(R.id.confirmPrice);
         System.out.println("Items : " + itemList);
 
-        itemsView.setText(itemList);
         setupSeekbars();
         priceView.setText(String.valueOf(price));
 
@@ -194,8 +194,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void onRefreshCick(final View view){
-        final TextView  curid = view.findViewById(R.id.id);
-        final TextView statusView = view.findViewById(R.id.status);
+        View parent = (View) view.getParent().getParent();
+        final TextView  curid = parent.findViewById(R.id.id);
+        final TextView statusView = findViewById(R.id.status);
 
         RequestQueue queue = Volley.newRequestQueue(this);
         String url ="http://192.168.1.105:5000/orders/details/"+curid.getText();
@@ -222,6 +223,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void confirmButtonClick(View view) {
+        if(itemList.equals("")){
+            Toast.makeText(
+                    MainActivity.this,
+                    "You cannot send an empty order",
+                    Toast.LENGTH_SHORT)
+                    .show();
+            return;
+        }
+
         String url = "http://192.168.1.105:5000/orders/create";
         RequestQueue MyRequestQueue = Volley.newRequestQueue(this);
         StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
@@ -234,11 +244,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .show();
                 currentOrder = new Order();
                 currentOrder.setItems(itemList);
-                currentOrder.setPrice(price);
                 currentOrder.setStatus("IN_PROGRESS");
-                int id = Integer.parseInt(response);
 
-                currentOrder.setId(id);
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+                    currentOrder.setPrice(Double.parseDouble(jsonObject.getString("FinalPrice")));
+                    currentOrder.setId(Integer.parseInt(jsonObject.getString("ID")));
+                    System.out.println("FINAL PRICE : " + Double.parseDouble(jsonObject.getString("FinalPrice")));
+                    System.out.println("ID : " + Integer.parseInt(jsonObject.getString("ID")));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
                 orderList.add(currentOrder);
 
             }
@@ -259,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 System.out.println("ITEMS !!!!!!!!!!!!  : " + itemList);
                 MyData.put("Items", itemList);
                 MyData.put("InitialPrice",String.valueOf(price));
-                MyData.put("DiscountID", "128943");
+                MyData.put("DiscountID", "615547");
                 MyData.put("Type", determineType());
                 MyData.put("Locale",currentLocale);
 
@@ -376,6 +393,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(!b)
             return;
         itemList = "";
+        price = 0.0;
         LinkedList<SeekBar>seekBars = new LinkedList<>();
 
         seekBars.add(lotusSeekbar);
@@ -389,39 +407,51 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         for(SeekBar bar :seekBars){
             switch(bar.getId()){
                 case R.id.seekBarLotus:{
-                    for(int j = 0 ; j < bar.getProgress(); j++)
+                    for(int j = 0 ; j < bar.getProgress(); j++){
                         itemList = itemList.concat("1,");
+                        price+=8;
+                    }
                     break;
                 }
                 case R.id.seekBarNoodles:{
-                    for(int j = 0 ; j < bar.getProgress(); j++)
+                    for(int j = 0 ; j < bar.getProgress(); j++){
                         itemList = itemList.concat("2,");
+                        price += 10;
+                    }
                     break;
                 }
                 case R.id.seekBarKuchi:{
-                    for(int j = 0 ; j < bar.getProgress(); j++)
+                    for(int j = 0 ; j < bar.getProgress(); j++){
                         itemList = itemList.concat("3,");
+                        price += 4;
+                    }
                     break;
                 }
                 case R.id.seekBarRoastedSoup:{
-                    for(int j = 0 ; j < bar.getProgress(); j++)
+                    for(int j = 0 ; j < bar.getProgress(); j++){
                         itemList = itemList.concat("4,");
+                        price+= 7;
+                    }
                     break;
                 }
                 case R.id.seekBarCarbonara:{
-                    for(int j = 0 ; j < bar.getProgress(); j++)
+                    for(int j = 0 ; j < bar.getProgress(); j++){
                         itemList = itemList.concat("5,");
+                        price+=5;
+                    }
                     break;
                 }
                 case R.id.seekBarPancakes:{
-                    for(int j = 0 ; j < bar.getProgress(); j++)
+                    for(int j = 0 ; j < bar.getProgress(); j++){
                         itemList = itemList.concat("6,");
+                        price += 3;
+                    }
                     break;
                 }
             }
         }
-        TextView itemListView = findViewById(R.id.confirmItems);
-        itemListView.setText(itemList);
+        TextView priceView = findViewById(R.id.confirmPrice);
+        priceView.setText(String.valueOf(price));
     }
 
     @Override
@@ -432,6 +462,89 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
 
+    }
+
+    public void onSyncClick(View view){
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url ="http://192.168.1.105:5000/orders";
+        orderList = new LinkedList<>();
+
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @SuppressLint("SetTextI18n")
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONArray jsonArray = new JSONArray(response);
+                            for(int i = 0 ; i < jsonArray.length(); i++){
+
+                                JSONObject jsonObj = jsonArray.getJSONObject(i);
+                                if(!jsonObj.getString("Status").equals("CANCELLED")){
+                                    Order order = new Order();
+                                    order.setStatus(jsonObj.getString("Status"));
+                                    order.setId(Integer.parseInt(jsonObj.getString("OrderID")));
+                                    order.setPrice(Double.parseDouble(jsonObj.getString("InitialPrice")));
+                                    order.setItems(jsonObj.getString("Items"));
+                                    orderList.add(order);
+                                }
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        setContentView(R.layout.orderpage);
+                        recyclerView = findViewById(R.id.recycler_view);
+
+                        Collections.sort(orderList, new OrderComparator());
+                        oAdapter = new DataAdapter(orderList);
+                        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+                        recyclerView.setLayoutManager(mLayoutManager);
+                        recyclerView.setItemAnimator(new DefaultItemAnimator());
+                        recyclerView.setAdapter(oAdapter);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+            }
+        });
+        queue.add(stringRequest);
+    }
+
+    public void onCancelClick(View view){
+        View parent = (View) view.getParent().getParent();
+        final TextView  curid = parent.findViewById(R.id.id);
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url ="http://192.168.1.105:5000/orders/delete/"+curid.getText();
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @SuppressLint("SetTextI18n")
+                    @Override
+                    public void onResponse(String response) {
+                        Iterator<Order> iter = orderList.iterator();
+
+                        while(iter.hasNext()){
+                            Order cur = iter.next();
+                            if(cur.getId() == Integer.parseInt(curid.getText().toString())){
+                                iter.remove();
+                            }
+                        }
+                        setContentView(R.layout.orderpage);
+                        recyclerView = findViewById(R.id.recycler_view);
+
+                        Collections.sort(orderList, new OrderComparator());
+                        oAdapter = new DataAdapter(orderList);
+                        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+                        recyclerView.setLayoutManager(mLayoutManager);
+                        recyclerView.setItemAnimator(new DefaultItemAnimator());
+                        recyclerView.setAdapter(oAdapter);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+            }
+        });
+        queue.add(stringRequest);
     }
 
 }

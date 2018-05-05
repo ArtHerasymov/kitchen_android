@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/background_dark"
+    android:background="@drawable/backgroundcarbon"
     tools:context="com.example.artie.client.MainActivity">
 
     <ToggleButton
         android:id="@+id/changeLocaleButton"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
+        android:background="@drawable/roundedbutton"
         android:onClick="onLocaleChangeClock"
         android:text=""
         android:textColor="@android:color/holo_orange_dark"
